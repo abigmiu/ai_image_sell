@@ -1,0 +1,5 @@
+.dev-run/
+LOCAL_SECRETS.md
+.tmp-go-build/
+.tmp-go-mod/
+.tmp-home/
