@@ -1,0 +1,67 @@
+main:
+  push:
+    - name: build-and-push-images
+      docker:
+        image: node:22
+      services:
+        - docker
+      imports:
+        - https://cnb.cool/abigmiu/keys/-/blob/main/codex.yaml
+      stages:
+        - name: set image tags
+          script: |
+            echo "##[set-output SUB2API_IMAGE_LATEST=${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}/sub2api:latest]"
+            echo "##[set-output SUB2API_IMAGE_COMMIT=${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}/sub2api:${CNB_COMMIT_SHORT}]"
+            echo "##[set-output PLAYGROUND_IMAGE_LATEST=${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}/gpt-image-playground:latest]"
+            echo "##[set-output PLAYGROUND_IMAGE_COMMIT=${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}/gpt-image-playground:${CNB_COMMIT_SHORT}]"
+          exports:
+            SUB2API_IMAGE_LATEST: SUB2API_IMAGE_LATEST
+            SUB2API_IMAGE_COMMIT: SUB2API_IMAGE_COMMIT
+            PLAYGROUND_IMAGE_LATEST: PLAYGROUND_IMAGE_LATEST
+            PLAYGROUND_IMAGE_COMMIT: PLAYGROUND_IMAGE_COMMIT
+        - name: build sub2api image
+          script:
+            - docker build -f sub2api/Dockerfile -t $SUB2API_IMAGE_LATEST -t $SUB2API_IMAGE_COMMIT ./sub2api
+        - name: push sub2api image
+          script:
+            - docker push $SUB2API_IMAGE_LATEST
+            - docker push $SUB2API_IMAGE_COMMIT
+        - name: build gpt image playground image
+          script:
+            - docker build -f gpt_image_playground/deploy/Dockerfile -t $PLAYGROUND_IMAGE_LATEST -t $PLAYGROUND_IMAGE_COMMIT ./gpt_image_playground
+        - name: push gpt image playground image
+          script:
+            - docker push $PLAYGROUND_IMAGE_LATEST
+            - docker push $PLAYGROUND_IMAGE_COMMIT
+        - name: notify build success
+          image: tencentcom/feishu-message
+          imports:
+            - https://cnb.cool/abigmiu/keys/-/blob/main/codex.yaml
+          settings:
+            robot: $FEISHU_WEBHOOK_URL
+            content: |
+              CNB 打包成功
+              项目：$CNB_REPO_SLUG
+              流水线：build-and-push-images
+              分支：$CNB_BRANCH
+              提交：$CNB_COMMIT_SHORT
+              构建 ID：$CNB_BUILD_ID
+              sub2api latest：$SUB2API_IMAGE_LATEST
+              sub2api commit：$SUB2API_IMAGE_COMMIT
+              playground latest：$PLAYGROUND_IMAGE_LATEST
+              playground commit：$PLAYGROUND_IMAGE_COMMIT
+      failStages:
+        - name: notify build failure
+          image: tencentcom/feishu-message
+          imports:
+            - https://cnb.cool/abigmiu/keys/-/blob/main/codex.yaml
+          settings:
+            robot: $FEISHU_WEBHOOK_URL
+            content: |
+              CNB 打包失败
+              项目：$CNB_REPO_SLUG
+              流水线：build-and-push-images
+              分支：$CNB_BRANCH
+              提交：$CNB_COMMIT_SHORT
+              构建 ID：$CNB_BUILD_ID
+              请到 CNB 构建日志查看失败原因
