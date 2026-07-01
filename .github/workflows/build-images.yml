@@ -16,10 +16,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout parent repo with submodules
+      - name: Checkout parent repo
         uses: actions/checkout@v4
         with:
-          submodules: recursive
+          submodules: false
+
+      - name: Checkout sub2api
+        uses: actions/checkout@v4
+        with:
+          repository: abigmiu/sub2api
+          ref: main
+          path: sub2api
+          token: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+
+      - name: Checkout image playground
+        uses: actions/checkout@v4
+        with:
+          repository: abigmiu/gpt_image_playground
+          ref: main
+          path: gpt_image_playground
           token: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
 
       - name: Set lowercase owner
