@@ -2,7 +2,7 @@ main:
   push:
     - name: build-and-push-images
       docker:
-        image: node:22
+        image: node:24
       services:
         - docker
       imports:
