@@ -1,10 +1,10 @@
 services:
   sub2api:
-    image: ghcr.io/${GHCR_OWNER}/sub2api:${SUB2API_IMAGE_TAG:-latest}
+    image: docker.cnb.cool/abigmiu/image2_sub2api/sub2api:latest
     container_name: sub2api
     restart: unless-stopped
     ports:
-      - "${SUB2API_PORT:-8081}:8080"
+      - "${SUB2API_PORT:-2111}:8080"
     environment:
       AUTO_SETUP: "true"
       SERVER_HOST: 0.0.0.0
@@ -38,13 +38,15 @@ services:
       TOTP_ENCRYPTION_KEY: ${TOTP_ENCRYPTION_KEY}
     volumes:
       - ./sub2api_data:/app/data
+    networks:
+      - 1panel-network
 
   playground:
-    image: ghcr.io/${GHCR_OWNER}/gpt-image-playground:${PLAYGROUND_IMAGE_TAG:-latest}
+    image: docker.cnb.cool/abigmiu/image2_sub2api/gpt-image-playground:latest
     container_name: image-playground
     restart: unless-stopped
     ports:
-      - "${PLAYGROUND_PORT:-3000}:80"
+      - "${PLAYGROUND_PORT:-2112}:80"
     environment:
       HOST: 0.0.0.0
       PORT: 80
@@ -52,3 +54,8 @@ services:
       LOCK_API_PROXY: "true"
       SHOW_DEFAULT_CONFIG_ONLY: "false"
       DEFAULT_API_URL: ${PLAYGROUND_DEFAULT_API_URL:-}
+    networks:
+      - 1panel-network
+networks:
+  1panel-network:
+    external: true
