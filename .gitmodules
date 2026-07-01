@@ -1,8 +1,8 @@
 [submodule "sub2api"]
 	path = sub2api
-	url = git@github.com:abigmiu/sub2api.git
+	url = https://github.com/abigmiu/sub2api.git
 	ignore = dirty
 [submodule "gpt_image_playground"]
 	path = gpt_image_playground
-	url = git@github.com:abigmiu/gpt_image_playground.git
+	url = https://github.com/abigmiu/gpt_image_playground.git
 	ignore = dirty
