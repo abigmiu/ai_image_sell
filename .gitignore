@@ -3,3 +3,4 @@ LOCAL_SECRETS.md
 .tmp-go-build/
 .tmp-go-mod/
 .tmp-home/
+.DS_Store

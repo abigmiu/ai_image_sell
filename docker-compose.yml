@@ -1,0 +1,54 @@
+services:
+  sub2api:
+    image: ghcr.io/${GHCR_OWNER}/sub2api:${SUB2API_IMAGE_TAG:-latest}
+    container_name: sub2api
+    restart: unless-stopped
+    ports:
+      - "${SUB2API_PORT:-8081}:8080"
+    environment:
+      AUTO_SETUP: "true"
+      SERVER_HOST: 0.0.0.0
+      SERVER_PORT: 8080
+      SERVER_MODE: ${SERVER_MODE:-release}
+      RUN_MODE: ${RUN_MODE:-standard}
+      TZ: ${TZ:-Asia/Shanghai}
+
+      DATABASE_HOST: ${DATABASE_HOST}
+      DATABASE_PORT: ${DATABASE_PORT:-5432}
+      DATABASE_USER: ${DATABASE_USER}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      DATABASE_DBNAME: ${DATABASE_DBNAME}
+      DATABASE_SSLMODE: ${DATABASE_SSLMODE:-disable}
+      DATABASE_MAX_OPEN_CONNS: ${DATABASE_MAX_OPEN_CONNS:-50}
+      DATABASE_MAX_IDLE_CONNS: ${DATABASE_MAX_IDLE_CONNS:-10}
+      DATABASE_CONN_MAX_LIFETIME_MINUTES: ${DATABASE_CONN_MAX_LIFETIME_MINUTES:-30}
+      DATABASE_CONN_MAX_IDLE_TIME_MINUTES: ${DATABASE_CONN_MAX_IDLE_TIME_MINUTES:-5}
+
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT:-6379}
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+      REDIS_DB: ${REDIS_DB:-0}
+      REDIS_POOL_SIZE: ${REDIS_POOL_SIZE:-1024}
+      REDIS_MIN_IDLE_CONNS: ${REDIS_MIN_IDLE_CONNS:-10}
+      REDIS_ENABLE_TLS: ${REDIS_ENABLE_TLS:-false}
+
+      ADMIN_EMAIL: ${ADMIN_EMAIL}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      TOTP_ENCRYPTION_KEY: ${TOTP_ENCRYPTION_KEY}
+    volumes:
+      - ./sub2api_data:/app/data
+
+  playground:
+    image: ghcr.io/${GHCR_OWNER}/gpt-image-playground:${PLAYGROUND_IMAGE_TAG:-latest}
+    container_name: image-playground
+    restart: unless-stopped
+    ports:
+      - "${PLAYGROUND_PORT:-3000}:80"
+    environment:
+      HOST: 0.0.0.0
+      PORT: 80
+      ENABLE_API_PROXY: "false"
+      LOCK_API_PROXY: "true"
+      SHOW_DEFAULT_CONFIG_ONLY: "false"
+      DEFAULT_API_URL: ${PLAYGROUND_DEFAULT_API_URL:-}
